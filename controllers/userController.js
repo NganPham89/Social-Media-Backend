@@ -12,8 +12,9 @@ module.exports = {
     async getSingleUser(req, res) {
         try {
             const userData = await User.findOne({ _id: req.params.userId })
+                .select("-__v")
                 .populate("thoughts")
-                .populate("friends");
+                .populate({ path: "friends", select: "-thoughts" });
             if (!userData) {
                 res.status(400).json({ message: `No user with that ID found` });
                 return;
@@ -56,7 +57,7 @@ module.exports = {
                 res.status(400).json({ message: `No user with that ID found` });
                 return;
             }
-            const thoughtsData = await Thought.deleteMany({ _id: { $in: userData.thoughts } })
+            const thoughtsData = await Thought.deleteMany({ username: { $in: userData.username } })
 
             res.status(200).json({ message: `User deleted successfully` });
         } catch (err) {
@@ -92,7 +93,7 @@ module.exports = {
         try {
             const userData = await User.findOneAndUpdate(
                 { _id: req.params.userId },
-                { $pull: { friends: { _id: req.params.friendId } } },
+                { $pull: { friends: req.params.friendId } },
                 { runValidators: true, new: true },
             )
             if (!userData) {
@@ -101,7 +102,7 @@ module.exports = {
             }
             const friendData = await User.findOneAndUpdate(
                 { _id: req.params.friendId },
-                { $pull: { friends: { _id: req.params.userId } } },
+                { $pull: { friends: req.params.userId } },
                 { runValidators: true, new: true },
             )
             if (!friendData) {

@@ -12,9 +12,9 @@ const {
 
 router.route("/").get(getThoughts).post(addThought);
 
-router.route("/:thoughtId").get(getSingleThought).put(updateThought).put(removeThought);
+router.route("/:thoughtId").get(getSingleThought).put(updateThought).delete(removeThought);
 
-router.route("/:thoughtId/reactions/").post(addReaction);
+router.route("/:thoughtId/reactions/").put(addReaction);
 
 router.route("/:thoughtId/reactions/:reactionId").put(removeReaction);
 
